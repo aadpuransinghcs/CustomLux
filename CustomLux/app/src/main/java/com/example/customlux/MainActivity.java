@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
         SwitchCompat serviceSwitch = findViewById(R.id.service_switch);
         Button btnCurveEditor = findViewById(R.id.btn_curve_editor);
 
-        // Week 7: Use Preferences to remember if the service was left on
+        //Use Preferences to remember if the service was left on
         prefs = getSharedPreferences("CustomLuxPrefs", MODE_PRIVATE);
         boolean isRunning = prefs.getBoolean("service_enabled", false);
         serviceSwitch.setChecked(isRunning);
@@ -36,14 +36,14 @@ public class MainActivity extends AppCompatActivity {
         serviceSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             prefs.edit().putBoolean("service_enabled", isChecked).apply();
             if (isChecked) {
-                // Future Step: Start Foreground Service (Week 9/Proposal)
+                // Future Step: Start Foreground Service
                 Toast.makeText(this, "Service Started", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "Service Stopped", Toast.LENGTH_SHORT).show();
             }
         });
 
-        // Week 8: Intent to move to another Activity (The Curve Editor)
+        // Intent to move to another Activity (The Curve Editor)
         btnCurveEditor.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, CurveEditorActivity.class);
             startActivity(intent);
@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (mode != AppOpsManager.MODE_ALLOWED) {
             // If not allowed, send the user to the Settings page
-            // Using an Implicit Intent (Week 8 concept)
+            // Using an Implicit Intent
             Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
             startActivity(intent);
             Toast.makeText(this, "Please enable Usage Access for CustomLux", Toast.LENGTH_LONG).show();
