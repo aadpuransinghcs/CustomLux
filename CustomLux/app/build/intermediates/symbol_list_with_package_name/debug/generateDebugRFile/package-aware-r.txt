@@ -1,0 +1,27 @@
+com.example.customlux
+color black
+color white
+drawable ic_launcher_background
+drawable ic_launcher_foreground
+id app_display
+id btn_curve_editor
+id btn_save_curve
+id curve_drawing_view
+id graph_container
+id label_max_brightness
+id label_min_brightness
+id label_point_count
+id lux_display
+id seek_max_brightness
+id seek_min_brightness
+id seek_point_count
+id service_switch
+layout activity_curve_editor
+layout activity_main
+mipmap ic_launcher
+mipmap ic_launcher_round
+string app_name
+style Base_Theme_CustomLux
+style Theme_CustomLux
+xml backup_rules
+xml data_extraction_rules

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Brightness Curve"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <FrameLayout
+            android:id="@+id/graph_container"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:layout_marginVertical="16dp"
+            android:background="#F5F5F5">
+
+            <ImageView
+                android:id="@+id/curve_drawing_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="Brightness Curve Editor"
+                android:scaleType="fitXY"
+                android:clickable="true"
+                android:focusable="true" />
+        </FrameLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Curve Settings"
+            android:textStyle="bold"
+            android:paddingTop="10dp"/>
+
+        <TextView
+            android:id="@+id/label_min_brightness"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Minimum Brightness: 10%" />
+
+        <SeekBar
+            android:id="@+id/seek_min_brightness"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="100"
+            android:progress="10" />
+
+        <TextView
+            android:id="@+id/label_max_brightness"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Maximum Brightness: 100%" />
+        <SeekBar
+            android:id="@+id/seek_max_brightness"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="100"
+            android:progress="100" />
+
+        <TextView
+            android:id="@+id/label_point_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Movable Points: 5" />
+        <SeekBar
+            android:id="@+id/seek_point_count"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="9"
+            android:progress="4" />
+
+        <Button
+            android:id="@+id/btn_save_curve"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:backgroundTint="#6200EE"
+            android:text="SAVE CURVE" />
+
+    </LinearLayout>
+</ScrollView>
