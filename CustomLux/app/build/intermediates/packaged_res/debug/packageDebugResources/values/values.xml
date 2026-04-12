@@ -2,6 +2,8 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <item name="navigation_curve" type="id"/>
+    <item name="navigation_dashboard" type="id"/>
     <string name="app_name">CustomLux</string>
     <style name="Base.Theme.CustomLux" parent="Theme.Material3.DayNight.NoActionBar">
         

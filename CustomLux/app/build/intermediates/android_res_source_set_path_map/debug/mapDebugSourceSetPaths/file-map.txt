@@ -30,10 +30,10 @@ com.example.customlux.app-cardview-1.0.0-28 C:\Users\panto\.gradle\caches\9.2.1\
 com.example.customlux.app-lifecycle-livedata-2.6.2-29 C:\Users\panto\.gradle\caches\9.2.1\transforms\ee177508e2c31756e07eaddaaab30672\workspace\transformed\lifecycle-livedata-2.6.2\res
 com.example.customlux.app-activity-1.13.0-30 C:\Users\panto\.gradle\caches\9.2.1\transforms\f489eb3e8b1fdfdf8bf16f654899864d\workspace\transformed\activity-1.13.0\res
 com.example.customlux.app-profileinstaller-1.4.0-31 C:\Users\panto\.gradle\caches\9.2.1\transforms\f9ff7a59b6145bce2c643fe812c4a0e6\workspace\transformed\profileinstaller-1.4.0\res
-com.example.customlux.app-pngs-32 C:\Users\panto\AndroidStudioProjects\CustomLux\app\build\generated\res\pngs\debug
-com.example.customlux.app-updated_navigation_xml-33 C:\Users\panto\AndroidStudioProjects\CustomLux\app\build\generated\updated_navigation_xml\debug
-com.example.customlux.app-packageDebugResources-34 C:\Users\panto\AndroidStudioProjects\CustomLux\app\build\intermediates\incremental\debug\packageDebugResources\merged.dir
-com.example.customlux.app-packageDebugResources-35 C:\Users\panto\AndroidStudioProjects\CustomLux\app\build\intermediates\incremental\debug\packageDebugResources\stripped.dir
-com.example.customlux.app-debug-36 C:\Users\panto\AndroidStudioProjects\CustomLux\app\build\intermediates\merged_res\debug\mergeDebugResources
-com.example.customlux.app-debug-37 C:\Users\panto\AndroidStudioProjects\CustomLux\app\src\debug\res
-com.example.customlux.app-main-38 C:\Users\panto\AndroidStudioProjects\CustomLux\app\src\main\res
+com.example.customlux.app-pngs-32 C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\build\generated\res\pngs\debug
+com.example.customlux.app-updated_navigation_xml-33 C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\build\generated\updated_navigation_xml\debug
+com.example.customlux.app-packageDebugResources-34 C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\build\intermediates\incremental\debug\packageDebugResources\merged.dir
+com.example.customlux.app-packageDebugResources-35 C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\build\intermediates\incremental\debug\packageDebugResources\stripped.dir
+com.example.customlux.app-debug-36 C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\build\intermediates\merged_res\debug\mergeDebugResources
+com.example.customlux.app-debug-37 C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\debug\res
+com.example.customlux.app-main-38 C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\res

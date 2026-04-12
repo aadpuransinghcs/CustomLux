@@ -1,66 +1,97 @@
 package com.example.customlux;
 
-import android.app.AppOpsManager;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
+import android.app.AlertDialog;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.widget.Button;
-import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SwitchCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
 
-public class MainActivity extends AppCompatActivity {
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-    private SharedPreferences prefs;
+public class MainActivity extends AppCompatActivity implements AppSelectionDialogFragment.OnAppSelectedListener {
+
+    private DatabaseHelper dbHelper;
+    private BottomNavigationView bottomNav;
+    private FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        SwitchCompat serviceSwitch = findViewById(R.id.service_switch);
-        Button btnCurveEditor = findViewById(R.id.btn_curve_editor);
+        dbHelper = new DatabaseHelper(this);
+        bottomNav = findViewById(R.id.bottom_navigation);
+        fab = findViewById(R.id.fab_add_profile);
 
-        //Use Preferences to remember if the service was left on
-        prefs = getSharedPreferences("CustomLuxPrefs", MODE_PRIVATE);
-        boolean isRunning = prefs.getBoolean("service_enabled", false);
-        serviceSwitch.setChecked(isRunning);
+        bottomNav.setOnNavigationItemSelectedListener(item -> {
+            int id = item.getItemId();
+            Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 
-        serviceSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            prefs.edit().putBoolean("service_enabled", isChecked).apply();
-            if (isChecked) {
-                // Future Step: Start Foreground Service
-                Toast.makeText(this, "Service Started", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, "Service Stopped", Toast.LENGTH_SHORT).show();
+            if (currentFragment instanceof CurveEditorFragment && id == R.id.navigation_dashboard) {
+                CurveEditorFragment curveFragment = (CurveEditorFragment) currentFragment;
+                if (curveFragment.hasUnsavedChanges()) {
+                    showUnsavedChangesDialog(curveFragment);
+                    return false; 
+                }
+            }
+
+            switchFragment(id);
+            return true;
+        });
+
+        fab.setOnClickListener(v -> {
+            // Fix: Prevent opening multiple dialogs if clicked quickly
+            if (getSupportFragmentManager().findFragmentByTag("AppSelection") == null) {
+                AppSelectionDialogFragment dialog = new AppSelectionDialogFragment();
+                dialog.show(getSupportFragmentManager(), "AppSelection");
             }
         });
 
-        // Intent to move to another Activity (The Curve Editor)
-        btnCurveEditor.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, CurveEditorActivity.class);
-            startActivity(intent);
-        });
+        if (savedInstanceState == null) {
+            switchFragment(R.id.navigation_dashboard);
+        }
     }
 
-    private void checkUsageStatsPermission() {
-        AppOpsManager appOps = (AppOpsManager) getSystemService(Context.APP_OPS_SERVICE);
-        int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
-                android.os.Process.myUid(), getPackageName());
+    private void switchFragment(int itemId) {
+        Fragment selectedFragment = null;
+        if (itemId == R.id.navigation_dashboard) {
+            selectedFragment = new DashboardFragment();
+            fab.show();
+        } else if (itemId == R.id.navigation_curve) {
+            selectedFragment = new CurveEditorFragment();
+            fab.hide();
+        }
 
-        if (mode != AppOpsManager.MODE_ALLOWED) {
-            // If not allowed, send the user to the Settings page
-            // Using an Implicit Intent
-            Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
-            startActivity(intent);
-            Toast.makeText(this, "Please enable Usage Access for CustomLux", Toast.LENGTH_LONG).show();
+        if (selectedFragment != null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, selectedFragment)
+                    .commit();
+        }
+    }
+
+    private void showUnsavedChangesDialog(CurveEditorFragment fragment) {
+        new AlertDialog.Builder(this)
+                .setTitle("Unsaved Changes")
+                .setMessage("Would you like to save your changes to the brightness curve?")
+                .setPositiveButton("Save", (dialog, which) -> {
+                    fragment.saveChanges();
+                    bottomNav.setSelectedItemId(R.id.navigation_dashboard);
+                })
+                .setNegativeButton("Discard", (dialog, which) -> {
+                    fragment.discardChanges();
+                    bottomNav.setSelectedItemId(R.id.navigation_dashboard);
+                })
+                .setNeutralButton("Cancel", null)
+                .show();
+    }
+
+    @Override
+    public void onAppSelected(String packageName, String appName) {
+        dbHelper.addProfile(new AppProfile(packageName, appName, 0, true));
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (fragment instanceof DashboardFragment) {
+            ((DashboardFragment) fragment).refreshAppProfiles();
         }
     }
 }
