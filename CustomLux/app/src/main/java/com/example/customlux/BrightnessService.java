@@ -240,7 +240,7 @@ public class BrightnessService extends Service implements SensorEventListener {
         int pixelStride = planes[0].getPixelStride();
         int rowStride = planes[0].getRowStride();
         int width = image.getWidth();
-        int height = image.getHeight();
+        int height = width != 0 ? image.getHeight() : 0;
 
         double totalLuminance = 0;
         int pixelCount = 0;
@@ -472,6 +472,8 @@ public class BrightnessService extends Service implements SensorEventListener {
             int brightness = calculateFinalBrightness(lastKnownLux);
             applyBrightness(brightness);
             broadcastUpdate(lastKnownLux, brightness);
+        } else if (isHbmActive) {
+            broadcastUpdate(lastKnownLux, -1);
         }
     }
 
@@ -481,11 +483,7 @@ public class BrightnessService extends Service implements SensorEventListener {
     private void broadcastUpdate(float lux, int brightness) {
         Intent intent = new Intent("lux_update");
         intent.putExtra("lux_value", lux);
-        if (brightness != -1) {
-            intent.putExtra("brightness_value", brightness * 100 / 255);
-        } else {
-            intent.putExtra("brightness_value", -1); // -1 signals HBM active
-        }
+        intent.putExtra("brightness_value", brightness != -1 ? (brightness * 100 / 255) : -1);
         sendBroadcast(intent);
     }
 

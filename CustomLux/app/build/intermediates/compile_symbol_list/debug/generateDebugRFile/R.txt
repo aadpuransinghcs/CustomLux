@@ -68,7 +68,6 @@ int string label_max_brightness 0x0
 int string label_min_brightness 0x0
 int string label_movable_points 0x0
 int string lux_value_label 0x0
-int string not_available 0x0
 int string title_advanced_settings 0x0
 int string title_app_profiles 0x0
 int string title_brightness_curve 0x0

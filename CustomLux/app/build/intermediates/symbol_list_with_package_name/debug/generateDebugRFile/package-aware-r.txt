@@ -69,7 +69,6 @@ string label_max_brightness
 string label_min_brightness
 string label_movable_points
 string lux_value_label
-string not_available
 string title_advanced_settings
 string title_app_profiles
 string title_brightness_curve

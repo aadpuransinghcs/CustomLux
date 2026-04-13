@@ -3,24 +3,24 @@
 3    package="com.example.customlux.test" >
 4
 5    <uses-sdk
-5-->C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest5962131026844320828.xml:5:5-74
+5-->C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest5672649052857672199.xml:5:5-74
 6        android:minSdkVersion="23"
-6-->C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest5962131026844320828.xml:5:15-41
+6-->C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest5672649052857672199.xml:5:15-41
 7        android:targetSdkVersion="33" />
-7-->C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest5962131026844320828.xml:5:42-71
+7-->C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest5672649052857672199.xml:5:42-71
 8
 9    <instrumentation
-9-->C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest5962131026844320828.xml:7:5-11:71
+9-->C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest5672649052857672199.xml:7:5-11:71
 10        android:name="androidx.test.runner.AndroidJUnitRunner"
-10-->C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest5962131026844320828.xml:7:22-76
+10-->C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest5672649052857672199.xml:7:22-76
 11        android:functionalTest="false"
-11-->C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest5962131026844320828.xml:10:22-52
+11-->C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest5672649052857672199.xml:10:22-52
 12        android:handleProfiling="false"
-12-->C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest5962131026844320828.xml:9:22-53
+12-->C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest5672649052857672199.xml:9:22-53
 13        android:label="Tests for com.example.customlux"
-13-->C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest5962131026844320828.xml:11:22-69
+13-->C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest5672649052857672199.xml:11:22-69
 14        android:targetPackage="com.example.customlux" />
-14-->C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest5962131026844320828.xml:8:22-67
+14-->C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\build\intermediates\tmp\manifest\androidTest\debug\tempFile1ProcessTestManifest5672649052857672199.xml:8:22-67
 15
 16    <uses-permission android:name="android.permission.REORDER_TASKS" />
 16-->[androidx.test:core:1.7.0] C:\Users\panto\.gradle\caches\9.2.1\transforms\58b8dfe96801cf2540697aef30e52a72\workspace\transformed\core-1.7.0\AndroidManifest.xml:24:5-72

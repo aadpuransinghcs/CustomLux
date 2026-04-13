@@ -62,7 +62,7 @@ public class DashboardFragment extends Fragment {
                 }
                 if (brightnessDisplay != null) {
                     if (brightness == -1) {
-                        brightnessDisplay.setText(getString(R.string.not_available));
+                        brightnessDisplay.setText(getString(R.string.brightness_default));
                     } else {
                         brightnessDisplay.setText(getString(R.string.brightness_value_label, brightness));
                     }

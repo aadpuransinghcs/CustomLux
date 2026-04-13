@@ -5,7 +5,6 @@
     <string name="label_max_brightness">Maximum Brightness: %1$d%%</string>
     <string name="lux_value_label">Ambient: %1$d Lux</string>
     <string name="brightness_value_label">Brightness: %1$d%%</string>
-    <string name="not_available">N/A</string>
     <string name="delete_profile">Delete profile</string>
 
     <!-- activity_curve_editor.xml -->
@@ -19,7 +18,7 @@
     <string name="title_white_level_comp">Smart White-Level Compensation</string>
     <string name="desc_white_level_comp">Reduces backlight when high percentage of white pixels are detected in dark environments.</string>
     <string name="title_hbm_handover">HBM Handover</string>
-    <string name="desc_hbm_handover">Automatically handover control to system adaptive brightness in direct sunlight (&gt;20,000 lux).</string>
+    <string name="desc_hbm_handover">Automatically handover control to system adaptive brightness in direct sunlight.</string>
     <string name="title_disable_curve">Disable Curve Editor</string>
     <string name="desc_disable_curve">Disables the curve editor and ignores the curve in brightness calculations.</string>
     <string name="toast_curve_disabled">Curve Editor Disabled</string>
