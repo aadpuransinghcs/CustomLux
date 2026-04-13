@@ -22,7 +22,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_OFFSET = "brightness_offset";
     public static final String COLUMN_ENABLED = "is_enabled";
 
-    // SQL statement to create the profiles table
     private static final String TABLE_CREATE =
             "CREATE TABLE " + TABLE_PROFILES + " (" +
                     "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -56,9 +55,31 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_APP_NAME, profile.getAppName());
         values.put(COLUMN_OFFSET, profile.getBrightnessOffset());
         values.put(COLUMN_ENABLED, profile.isEnabled() ? 1 : 0);
-        // Replace if package name already exists
         db.insertWithOnConflict(TABLE_PROFILES, null, values, SQLiteDatabase.CONFLICT_REPLACE);
         db.close();
+    }
+
+    /**
+     * Retrieves a single profile by package name.
+     */
+    public AppProfile getProfile(String packageName) {
+        if (packageName == null || packageName.isEmpty()) return null;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_PROFILES, null, COLUMN_PACKAGE + " = ?", 
+                new String[]{packageName}, null, null, null);
+        
+        AppProfile profile = null;
+        if (cursor != null && cursor.moveToFirst()) {
+            profile = new AppProfile(
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_PACKAGE)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_APP_NAME)),
+                    cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_OFFSET)),
+                    cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ENABLED)) == 1
+            );
+            cursor.close();
+        }
+        db.close();
+        return profile;
     }
 
     /**

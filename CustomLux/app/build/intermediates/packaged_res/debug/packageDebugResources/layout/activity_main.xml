@@ -10,6 +10,7 @@
         android:layout_height="match_parent"
         android:layout_above="@id/bottom_navigation" />
 
+    <!-- Floating button for adding App Profiles -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_profile"
         android:layout_width="wrap_content"
@@ -21,6 +22,7 @@
         app:tint="@android:color/white"
         app:backgroundTint="#6200EE" />
 
+    <!-- Bottom Navigation Menu (Dashboard and Curve Editor Fragments) -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"

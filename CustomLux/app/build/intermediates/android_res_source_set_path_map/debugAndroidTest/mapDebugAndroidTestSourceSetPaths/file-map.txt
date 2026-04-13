@@ -1,0 +1,6 @@
+com.example.customlux.test.app-tracing-1.2.0-0 C:\Users\panto\.gradle\caches\9.2.1\transforms\2b6262aa0460486bb117b38ed3f3a6ca\workspace\transformed\tracing-1.2.0\res
+com.example.customlux.test.app-core-1.7.0-1 C:\Users\panto\.gradle\caches\9.2.1\transforms\58b8dfe96801cf2540697aef30e52a72\workspace\transformed\core-1.7.0\res
+com.example.customlux.test.app-updated_navigation_xml-2 C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\build\generated\updated_navigation_xml\debugAndroidTest
+com.example.customlux.test.app-packageDebugAndroidTestResources-3 C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\build\intermediates\incremental\debugAndroidTest\packageDebugAndroidTestResources\merged.dir
+com.example.customlux.test.app-packageDebugAndroidTestResources-4 C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\build\intermediates\incremental\debugAndroidTest\packageDebugAndroidTestResources\stripped.dir
+com.example.customlux.test.app-debugAndroidTest-5 C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\build\intermediates\merged_res\debugAndroidTest\mergeDebugAndroidTestResources

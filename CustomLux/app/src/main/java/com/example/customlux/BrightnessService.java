@@ -26,11 +26,9 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.WindowManager;
 
 import java.nio.ByteBuffer;
-import java.util.List;
 
 /**
  * Foreground service that monitors ambient light and adjusts screen brightness.
@@ -46,10 +44,15 @@ public class BrightnessService extends Service implements SensorEventListener {
     private static final String CHANNEL_ID = "CustomLuxChannel";
     private final float MAX_LUX = 10000f;
     private final float MIN_LUX = 1f;
-    private final float HBM_THRESHOLD = 20000f;
+    private final float HBM_THRESHOLD = 10000f;
 
     private int originalBrightnessMode = -1;
     private boolean isHbmActive = false;
+    private int lastAppOffset = 0;
+
+    // Persistent state for foreground app detection to avoid "losing" the app after a few seconds
+    private String currentForegroundApp = "";
+    private long lastAppCheckTime = 0;
 
     // MediaProjection for White-Level Compensation
     private MediaProjection mediaProjection;
@@ -96,29 +99,27 @@ public class BrightnessService extends Service implements SensorEventListener {
         startForeground(777, builder.build());
     }
 
+    /**
+     * Records the user's current brightness mode to restore it when service stops.
+     */
     private void saveOriginalBrightnessMode() {
-        try {
-            originalBrightnessMode = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE);
-        } catch (Settings.SettingNotFoundException e) {
-            originalBrightnessMode = 0;
-        }
+        originalBrightnessMode = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, 0);
     }
 
+    /**
+     * Restores the system's original brightness mode.
+     */
     private void restoreOriginalBrightnessMode() {
         if (originalBrightnessMode != -1) {
-            try {
-                Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, originalBrightnessMode);
-            } catch (Exception e) {
-                Log.e("BrightnessService", "Restore failed", e);
-            }
+            Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, originalBrightnessMode);
         }
     }
 
+    /**
+     * Disables system adaptive brightness while CustomLux is active.
+     */
     private void disableSystemAdaptiveBrightness() {
-        try {
-            Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, 0); // Manual
-        } catch (Exception e) {
-        }
+        Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, 0); // 0 = Manual
     }
 
     private void createNotificationChannel() {
@@ -155,6 +156,9 @@ public class BrightnessService extends Service implements SensorEventListener {
         }
     }
 
+    /**
+     * Initializes MediaProjection to start capturing screen content.
+     */
     private void startProjection() {
         MediaProjectionManager mpm = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
         mediaProjection = mpm.getMediaProjection(-1, projectionIntent);
@@ -165,6 +169,9 @@ public class BrightnessService extends Service implements SensorEventListener {
         }
     }
 
+    /**
+     * Creates a tiny virtual display for efficient APL analysis.
+     */
     private void setupVirtualDisplay() {
         DisplayMetrics metrics = new DisplayMetrics();
         WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
@@ -179,6 +186,9 @@ public class BrightnessService extends Service implements SensorEventListener {
         }
     }
 
+    /**
+     * Periodically schedules the next APL calculation.
+     */
     private void scheduleAplCalculation() {
         if (!isProjectionRunning) return;
         projectionHandler.postDelayed(() -> {
@@ -192,44 +202,42 @@ public class BrightnessService extends Service implements SensorEventListener {
      */
     private void calculateApl() {
         if (imageReader == null) return;
-        Image image = null;
-        try {
-            image = imageReader.acquireLatestImage();
-            if (image == null) return;
+        Image image = imageReader.acquireLatestImage();
+        if (image == null) return;
 
-            Image.Plane[] planes = image.getPlanes();
-            ByteBuffer buffer = planes[0].getBuffer();
-            int pixelStride = planes[0].getPixelStride();
-            int rowStride = planes[0].getRowStride();
-            int width = image.getWidth();
-            int height = image.getHeight();
+        Image.Plane[] planes = image.getPlanes();
+        ByteBuffer buffer = planes[0].getBuffer();
+        int pixelStride = planes[0].getPixelStride();
+        int rowStride = planes[0].getRowStride();
+        int width = image.getWidth();
+        int height = image.getHeight();
 
-            double totalLuminance = 0;
-            int pixelCount = 0;
+        double totalLuminance = 0;
+        int pixelCount = 0;
 
-            for (int y = 0; y < height; y++) {
-                for (int x = 0; x < width; x++) {
-                    int offset = y * rowStride + x * pixelStride;
-                    int r = buffer.get(offset) & 0xFF;
-                    int g = buffer.get(offset + 1) & 0xFF;
-                    int b = buffer.get(offset + 2) & 0xFF;
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int offset = y * rowStride + x * pixelStride;
+                int r = buffer.get(offset) & 0xFF;
+                int g = buffer.get(offset + 1) & 0xFF;
+                int b = buffer.get(offset + 2) & 0xFF;
 
-                    // Perceived Luminance: L = 0.299R + 0.587G + 0.114B
-                    double l = (0.299 * r + 0.587 * g + 0.114 * b);
-                    totalLuminance += l;
-                    pixelCount++;
-                }
+                // Perceived Luminance: L = 0.299R + 0.587G + 0.114B
+                double l = (0.299 * r + 0.587 * g + 0.114 * b);
+                totalLuminance += l;
+                pixelCount++;
             }
-
-            if (pixelCount > 0) {
-                currentApl = (float) (totalLuminance / pixelCount / 255.0);
-            }
-        } catch (Exception e) {
-        } finally {
-            if (image != null) image.close();
         }
+
+        if (pixelCount > 0) {
+            currentApl = (float) (totalLuminance / pixelCount / 255.0);
+        }
+        image.close();
     }
 
+    /**
+     * Stops screen content analysis and releases resources.
+     */
     private void stopProjection() {
         isProjectionRunning = false;
         if (virtualDisplay != null) virtualDisplay.release();
@@ -244,7 +252,8 @@ public class BrightnessService extends Service implements SensorEventListener {
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
             float lux = event.values[0];
-            
+
+            // Check for High Brightness Mode handover threshold
             boolean hbmEnabled = prefs.getBoolean("hbm_handover", false);
             if (hbmEnabled) {
                 handleHbmHandover(lux);
@@ -252,6 +261,7 @@ public class BrightnessService extends Service implements SensorEventListener {
                 disableHbmMode();
             }
 
+            // Only apply CustomLux curve if HBM isn't taking over
             if (!isHbmActive) {
                 int brightness = calculateFinalBrightness(lux);
                 applyBrightness(brightness);
@@ -263,7 +273,9 @@ public class BrightnessService extends Service implements SensorEventListener {
         }
     }
 
-    // Restore system adaptive brightness in direct sunlight
+    /**
+     * Switches control between CustomLux and system adaptive brightness based on lux.
+     */
     private void handleHbmHandover(float lux) {
         if (lux > HBM_THRESHOLD && !isHbmActive) {
             enableHbmMode();
@@ -272,44 +284,58 @@ public class BrightnessService extends Service implements SensorEventListener {
         }
     }
 
+    /**
+     * Activates system adaptive brightness for direct sunlight visibility.
+     */
     private void enableHbmMode() {
         isHbmActive = true;
-        try {
-            Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, 1);
-        } catch (Exception e) {}
+        Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, 1);
     }
 
+    /**
+     * Deactivates system adaptive brightness to return control to CustomLux.
+     */
     private void disableHbmMode() {
         isHbmActive = false;
-        try {
-            Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, 0);
-        } catch (Exception e) {}
+        Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, 0);
     }
 
     /**
      * Calculates brightness combining base curve, app offset, and APL compensation.
      */
     private int calculateFinalBrightness(float lux) {
-        int baseBrightness = getCurveBrightness(lux);
-        String currentApp = getForegroundApp();
-        int offsetPercentage = 0;
-        
-        List<AppProfile> profiles = dbHelper.getAllProfiles();
-        for (AppProfile profile : profiles) {
-            if (profile.getPackageName().equals(currentApp) && profile.isEnabled()) {
-                offsetPercentage = profile.getBrightnessOffset();
-                break;
-            }
+        boolean curveDisabled = prefs.getBoolean("disable_curve_editor", false);
+        int baseBrightness;
+
+        if (curveDisabled) {
+            baseBrightness = Settings.System.getInt(getContentResolver(),
+                    Settings.System.SCREEN_BRIGHTNESS, 128);
+        } else {
+            baseBrightness = getCurveBrightness(lux);
         }
 
-        int finalBrightnessValue = baseBrightness + (offsetPercentage * 255 / 100);
+        String currentApp = getForegroundApp();
+        AppProfile profile = dbHelper.getProfile(currentApp);
 
-        // Smart dimming for white content in dark environments
+        int finalBrightnessValue = baseBrightness;
+        int activeOffsetPercentage = 0; // Local variable to ensure fresh calculation
+
+        if (profile != null && profile.isEnabled()) {
+            activeOffsetPercentage = profile.getBrightnessOffset();
+            // Convert % to 0-255 scale
+            int scaleOffset = (activeOffsetPercentage * 255 / 100);
+            finalBrightnessValue += scaleOffset;
+        }
+
+        // Update the global tracking variable for the UI
+        lastAppOffset = activeOffsetPercentage;
+
+        // Smart dimming for white content (APL)
         if (lux < 50 && prefs.getBoolean("white_level_comp", false)) {
-            float reductionFactor = 1.0f - (currentApl * 0.4f); 
+            float reductionFactor = 1.0f - (currentApl * 0.4f);
             finalBrightnessValue = (int) (finalBrightnessValue * reductionFactor);
         }
-        
+
         return Math.max(0, Math.min(finalBrightnessValue, 255));
     }
 
@@ -329,56 +355,72 @@ public class BrightnessService extends Service implements SensorEventListener {
             points[i] = Integer.parseInt(parts[i]);
         }
 
+        // Map current lux to its position on the logarithmic curve
         double minLog = Math.log10(MIN_LUX);
         double maxLog = Math.log10(MAX_LUX);
         double currentLog = Math.log10(Math.max(MIN_LUX, Math.min(lux, MAX_LUX)));
-        
+
         float position = (float) ((currentLog - minLog) / (maxLog - minLog) * (numPoints - 1));
         int index = (int) position;
         float fraction = position - index;
 
         if (index >= numPoints - 1) return (points[numPoints - 1] * 255 / 100);
-        
+
+        // Linear interpolation between the two nearest curve points
         int b1 = points[index];
         int b2 = points[index + 1];
         float interpolated = b1 + (b2 - b1) * fraction;
-        
+
         return (int) (interpolated * 255 / 100);
     }
 
     /**
-     * Identify currently active app using UsageStats API.
+     * Identify currently active app using UsageStats API with persistence to handle idle states.
      */
     private String getForegroundApp() {
         UsageStatsManager usm = (UsageStatsManager) getSystemService(Context.USAGE_STATS_SERVICE);
-        if (usm == null) return "";
-        long time = System.currentTimeMillis();
-        UsageEvents events = usm.queryEvents(time - 5000, time);
+        if (usm == null) return currentForegroundApp;
+
+        long currentTime = System.currentTimeMillis();
+        // Limit frequency of system calls to once per second
+        if (currentTime - lastAppCheckTime < 1000 && !currentForegroundApp.isEmpty()) {
+            return currentForegroundApp;
+        }
+        lastAppCheckTime = currentTime;
+
+        // Look back 1 minute to find the most recent foreground transition
+        UsageEvents events = usm.queryEvents(currentTime - 60000, currentTime);
         UsageEvents.Event event = new UsageEvents.Event();
-        String lastPackage = "";
+        String detectedApp = currentForegroundApp;
+
         while (events.hasNextEvent()) {
             events.getNextEvent(event);
             if (event.getEventType() == UsageEvents.Event.MOVE_TO_FOREGROUND) {
-                lastPackage = event.getPackageName();
+                detectedApp = event.getPackageName();
             }
         }
-        return lastPackage;
+
+        currentForegroundApp = detectedApp;
+        return currentForegroundApp;
     }
 
+    /**
+     * Applies the calculated brightness value to the system settings.
+     */
     private void applyBrightness(int value) {
-        try {
-            Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, value);
-        } catch (Exception e) {
-        }
+        Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, value);
     }
 
+    /**
+     * Broadcasts current lux and brightness values to the dashboard UI.
+     */
     private void broadcastUpdate(float lux, int brightness) {
         Intent intent = new Intent("lux_update");
         intent.putExtra("lux_value", lux);
         if (brightness != -1) {
             intent.putExtra("brightness_value", (int)(brightness * 100 / 255));
         } else {
-            intent.putExtra("brightness_value", -1);
+            intent.putExtra("brightness_value", -1); // -1 signals HBM active
         }
         sendBroadcast(intent);
     }
@@ -393,7 +435,7 @@ public class BrightnessService extends Service implements SensorEventListener {
     public void onDestroy() {
         stopProjection();
         sensorManager.unregisterListener(this);
-        restoreOriginalBrightnessMode();
+        restoreOriginalBrightnessMode(); // Restore system settings on exit
         super.onDestroy();
     }
 }

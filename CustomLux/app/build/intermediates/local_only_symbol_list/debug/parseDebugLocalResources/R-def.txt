@@ -39,6 +39,7 @@ id seek_max_brightness
 id seek_min_brightness
 id seek_point_count
 id service_switch
+id switch_disable_curve
 id switch_hbm
 id switch_white_level
 layout activity_curve_editor
@@ -48,6 +49,7 @@ layout fragment_dashboard
 layout item_app_profile
 menu bottom_nav_menu
 mipmap ic_launcher
+mipmap ic_launcher_foreground
 mipmap ic_launcher_round
 string action_settings
 string ambient_default
@@ -60,6 +62,7 @@ string default_app_name
 string delete_profile
 string desc_app_profiles
 string desc_curve_editor
+string desc_disable_curve
 string desc_hbm_handover
 string desc_white_level_comp
 string label_brightness_service
@@ -73,8 +76,10 @@ string title_app_profiles
 string title_brightness_curve
 string title_curve_settings
 string title_dashboard
+string title_disable_curve
 string title_hbm_handover
 string title_white_level_comp
+string toast_curve_disabled
 string zero_percent
 style Base.Theme.CustomLux
 style Theme.CustomLux

@@ -22,6 +22,7 @@
     <string name="delete_profile">Delete profile</string>
     <string name="desc_app_profiles">Set custom brightness levels for specific apps</string>
     <string name="desc_curve_editor">Brightness Curve Editor</string>
+    <string name="desc_disable_curve">Disables the curve editor and ignores the curve in brightness calculations.</string>
     <string name="desc_hbm_handover">Automatically handover control to system adaptive brightness in direct sunlight (>20,000 lux).</string>
     <string name="desc_white_level_comp">Reduces backlight when high percentage of white pixels are detected in dark environments.</string>
     <string name="label_brightness_service">Brightness Service</string>
@@ -35,8 +36,10 @@
     <string name="title_brightness_curve">Brightness Curve</string>
     <string name="title_curve_settings">Curve Settings</string>
     <string name="title_dashboard">CustomLux Dashboard</string>
+    <string name="title_disable_curve">Disable Curve Editor</string>
     <string name="title_hbm_handover">HBM Handover</string>
     <string name="title_white_level_comp">Smart White-Level Compensation</string>
+    <string name="toast_curve_disabled">Curve Editor Disabled</string>
     <string name="zero_percent">0%%</string>
     <style name="Base.Theme.CustomLux" parent="Theme.Material3.DayNight.NoActionBar">
         

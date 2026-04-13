@@ -9,6 +9,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <!-- Curve Editor Title -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -17,6 +18,7 @@
             android:textStyle="bold"
             android:textColor="@color/text_main" />
 
+        <!-- Curve Editor -->
         <FrameLayout
             android:id="@+id/graph_container"
             android:layout_width="match_parent"
@@ -34,6 +36,7 @@
                 android:focusable="true" />
         </FrameLayout>
 
+        <!-- Curve Settings -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -42,6 +45,7 @@
             android:textColor="@color/text_main"
             android:paddingTop="10dp"/>
 
+        <!-- Min Brightness -->
         <TextView
             android:id="@+id/label_min_brightness"
             android:layout_width="wrap_content"
@@ -56,6 +60,7 @@
             android:max="100"
             android:progress="10" />
 
+        <!-- Max Brightness -->
         <TextView
             android:id="@+id/label_max_brightness"
             android:layout_width="wrap_content"
@@ -70,6 +75,7 @@
             android:max="100"
             android:progress="100" />
 
+        <!-- Movable Points -->
         <TextView
             android:id="@+id/label_point_count"
             android:layout_width="wrap_content"
@@ -83,6 +89,7 @@
             android:max="9"
             android:progress="4" />
 
+        <!-- Save Curve Button -->
         <Button
             android:id="@+id/btn_save_curve"
             android:layout_width="match_parent"

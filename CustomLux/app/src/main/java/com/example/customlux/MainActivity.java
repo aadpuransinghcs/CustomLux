@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.projection.MediaProjectionManager;
 import android.os.Bundle;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -36,6 +38,21 @@ public class MainActivity extends AppCompatActivity implements AppSelectionDialo
         // Handle navigation between fragments with unsaved changes check
         bottomNav.setOnNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
+
+            // Check if we are already on the selected fragment to prevent reloading
+            if (bottomNav.getSelectedItemId() == id) {
+                return false;
+            }
+
+            boolean isCurveDisabled = getSharedPreferences("CustomLuxPrefs", MODE_PRIVATE)
+                    .getBoolean("disable_curve_editor", false);
+
+            // Prevent entering the curve editor if it's disabled
+            if (id == R.id.navigation_curve && isCurveDisabled) {
+                Toast.makeText(this, "Please Re-enable Curve Editor", Toast.LENGTH_SHORT).show();
+                return false; // Intercept click
+            }
+
             Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 
             if (currentFragment instanceof CurveEditorFragment && id == R.id.navigation_dashboard) {
@@ -61,6 +78,12 @@ public class MainActivity extends AppCompatActivity implements AppSelectionDialo
         if (savedInstanceState == null) {
             switchFragment(R.id.navigation_dashboard);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateCurveEditorMenuAppearance();
     }
 
     /**
@@ -100,6 +123,21 @@ public class MainActivity extends AppCompatActivity implements AppSelectionDialo
                 })
                 .setNeutralButton("Cancel", null)
                 .show();
+    }
+
+    public void updateCurveEditorMenuAppearance() {
+        boolean isCurveDisabled = getSharedPreferences("CustomLuxPrefs", MODE_PRIVATE)
+                .getBoolean("disable_curve_editor", false);
+
+        // Find the actual VIEW of the menu item (not the MenuItem object)
+        View curveItemView = findViewById(R.id.navigation_curve);
+
+        if (curveItemView != null) {
+            // 0.3f makes it look significantly grayed out
+            curveItemView.setAlpha(isCurveDisabled ? 0.3f : 1.0f);
+            // keep it enabled, just greyed out
+            curveItemView.setEnabled(true);
+        }
     }
 
     /**
