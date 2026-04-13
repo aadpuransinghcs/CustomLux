@@ -1,10 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="bg_accent">#F0F0F0</color>
+    <color name="bg_app">#FFFFFF</color>
+    <color name="bg_card">#FFFFFF</color>
+    <color name="purple_curve">#6200EE</color>
+    <color name="switch_thumb_off">#FFFFFF</color>
+    <color name="switch_track_off">#BDBDBD</color>
+    <color name="text_main">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="text_sub">#9E9E9E</color>
     <item name="navigation_curve" type="id"/>
     <item name="navigation_dashboard" type="id"/>
+    <string name="action_settings">Settings</string>
+    <string name="ambient_default">Ambient: --</string>
     <string name="app_name">CustomLux</string>
+    <string name="brightness_default">Brightness: --</string>
+    <string name="brightness_value_label">Brightness: %1$d%%</string>
+    <string name="btn_close">CLOSE</string>
+    <string name="btn_save_curve">SAVE CURVE</string>
+    <string name="default_app_name">App Name</string>
+    <string name="delete_profile">Delete profile</string>
+    <string name="desc_app_profiles">Set custom brightness levels for specific apps</string>
+    <string name="desc_curve_editor">Brightness Curve Editor</string>
+    <string name="desc_hbm_handover">Automatically handover control to system adaptive brightness in direct sunlight (>20,000 lux).</string>
+    <string name="desc_white_level_comp">Reduces backlight when high percentage of white pixels are detected in dark environments.</string>
+    <string name="label_brightness_service">Brightness Service</string>
+    <string name="label_max_brightness">Maximum Brightness: %1$d%%</string>
+    <string name="label_min_brightness">Minimum Brightness: %1$d%%</string>
+    <string name="label_movable_points">Movable Points: %1$d</string>
+    <string name="lux_value_label">Ambient: %1$d Lux</string>
+    <string name="not_available">N/A</string>
+    <string name="title_advanced_settings">Advanced Settings</string>
+    <string name="title_app_profiles">App Profiles</string>
+    <string name="title_brightness_curve">Brightness Curve</string>
+    <string name="title_curve_settings">Curve Settings</string>
+    <string name="title_dashboard">CustomLux Dashboard</string>
+    <string name="title_hbm_handover">HBM Handover</string>
+    <string name="title_white_level_comp">Smart White-Level Compensation</string>
+    <string name="zero_percent">0%%</string>
     <style name="Base.Theme.CustomLux" parent="Theme.Material3.DayNight.NoActionBar">
         
         

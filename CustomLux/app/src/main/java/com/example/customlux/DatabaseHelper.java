@@ -9,20 +9,23 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Manages the SQLite database for storing per-app brightness profiles.
+ */
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "CustomLux.db";
     private static final int DATABASE_VERSION = 1;
 
     public static final String TABLE_PROFILES = "app_profiles";
-    public static final String COLUMN_ID = "_id";
     public static final String COLUMN_PACKAGE = "package_name";
     public static final String COLUMN_APP_NAME = "app_name";
     public static final String COLUMN_OFFSET = "brightness_offset";
     public static final String COLUMN_ENABLED = "is_enabled";
 
+    // SQL statement to create the profiles table
     private static final String TABLE_CREATE =
             "CREATE TABLE " + TABLE_PROFILES + " (" +
-                    COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     COLUMN_PACKAGE + " TEXT UNIQUE, " +
                     COLUMN_APP_NAME + " TEXT, " +
                     COLUMN_OFFSET + " INTEGER, " +
@@ -43,6 +46,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    /**
+     * Adds or updates an app profile in the database.
+     */
     public void addProfile(AppProfile profile) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -50,10 +56,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_APP_NAME, profile.getAppName());
         values.put(COLUMN_OFFSET, profile.getBrightnessOffset());
         values.put(COLUMN_ENABLED, profile.isEnabled() ? 1 : 0);
+        // Replace if package name already exists
         db.insertWithOnConflict(TABLE_PROFILES, null, values, SQLiteDatabase.CONFLICT_REPLACE);
         db.close();
     }
 
+    /**
+     * Retrieves all app profiles from the database.
+     */
     public List<AppProfile> getAllProfiles() {
         List<AppProfile> profileList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
@@ -75,6 +85,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return profileList;
     }
 
+    /**
+     * Updates an existing profile's offset and enabled state.
+     */
     public void updateProfile(AppProfile profile) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -84,6 +97,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    /**
+     * Removes an app profile from the database.
+     */
     public void deleteProfile(String packageName) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_PROFILES, COLUMN_PACKAGE + " = ?", new String[]{packageName});

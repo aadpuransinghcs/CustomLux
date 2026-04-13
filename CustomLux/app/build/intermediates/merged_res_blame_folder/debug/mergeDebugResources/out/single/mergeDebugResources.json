@@ -20,10 +20,6 @@
         "source": "C:\\Users\\panto\\.gradle\\daemon\\9.2.1\\com.example.customlux.app-main-37:\\mipmap-xhdpi\\ic_launcher.webp"
     },
     {
-        "merged": "com.example.customlux.app-debug-35:/layout_item_app_profile.xml.flat",
-        "source": "com.example.customlux.app-main-37:/layout/item_app_profile.xml"
-    },
-    {
         "merged": "C:\\Users\\panto\\.gradle\\daemon\\9.2.1\\com.example.customlux.app-debug-35:\\layout_fragment_dashboard.xml.flat",
         "source": "C:\\Users\\panto\\.gradle\\daemon\\9.2.1\\com.example.customlux.app-main-37:\\layout\\fragment_dashboard.xml"
     },
@@ -64,6 +60,10 @@
         "source": "C:\\Users\\panto\\.gradle\\daemon\\9.2.1\\com.example.customlux.app-main-37:\\mipmap-anydpi-v26\\ic_launcher_round.xml"
     },
     {
+        "merged": "C:\\Users\\panto\\.gradle\\daemon\\9.2.1\\com.example.customlux.app-debug-35:\\layout_dialog_settings.xml.flat",
+        "source": "C:\\Users\\panto\\.gradle\\daemon\\9.2.1\\com.example.customlux.app-main-37:\\layout\\dialog_settings.xml"
+    },
+    {
         "merged": "C:\\Users\\panto\\.gradle\\daemon\\9.2.1\\com.example.customlux.app-debug-35:\\mipmap-mdpi_ic_launcher_round.webp.flat",
         "source": "C:\\Users\\panto\\.gradle\\daemon\\9.2.1\\com.example.customlux.app-main-37:\\mipmap-mdpi\\ic_launcher_round.webp"
     },
@@ -84,12 +84,12 @@
         "source": "C:\\Users\\panto\\.gradle\\daemon\\9.2.1\\com.example.customlux.app-main-37:\\mipmap-xxxhdpi\\ic_launcher.webp"
     },
     {
-        "merged": "com.example.customlux.app-debug-35:/layout_activity_curve_editor.xml.flat",
-        "source": "com.example.customlux.app-main-37:/layout/activity_curve_editor.xml"
-    },
-    {
         "merged": "C:\\Users\\panto\\.gradle\\daemon\\9.2.1\\com.example.customlux.app-debug-35:\\mipmap-hdpi_ic_launcher.webp.flat",
         "source": "C:\\Users\\panto\\.gradle\\daemon\\9.2.1\\com.example.customlux.app-main-37:\\mipmap-hdpi\\ic_launcher.webp"
+    },
+    {
+        "merged": "C:\\Users\\panto\\.gradle\\daemon\\9.2.1\\com.example.customlux.app-debug-35:\\drawable_ic_settings.xml.flat",
+        "source": "C:\\Users\\panto\\.gradle\\daemon\\9.2.1\\com.example.customlux.app-main-37:\\drawable\\ic_settings.xml"
     },
     {
         "merged": "C:\\Users\\panto\\.gradle\\daemon\\9.2.1\\com.example.customlux.app-debug-35:\\mipmap-anydpi-v26_ic_launcher.xml.flat",

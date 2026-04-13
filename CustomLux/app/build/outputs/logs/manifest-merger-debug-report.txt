@@ -1,9 +1,9 @@
 -- Merging decision tree log ---
 manifest
-ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:2:1-50:12
-INJECTED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:2:1-50:12
-INJECTED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:2:1-50:12
-INJECTED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:2:1-50:12
+ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:2:1-51:12
+INJECTED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:2:1-51:12
+INJECTED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:2:1-51:12
+INJECTED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:2:1-51:12
 MERGED from [com.google.android.material:material:1.13.0] C:\Users\panto\.gradle\caches\9.2.1\transforms\05b3606e7f775ee96e934027dd6727ca\workspace\transformed\material-1.13.0\AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.constraintlayout:constraintlayout:2.2.1] C:\Users\panto\.gradle\caches\9.2.1\transforms\d9d93beffa406ce8a3ecc2f5327ef6f5\workspace\transformed\constraintlayout-2.2.1\AndroidManifest.xml:2:1-9:12
 MERGED from [androidx.appcompat:appcompat-resources:1.7.1] C:\Users\panto\.gradle\caches\9.2.1\transforms\7f944f29bb808fd75759e0dc6d18eed8\workspace\transformed\appcompat-resources-1.7.1\AndroidManifest.xml:2:1-7:12
@@ -73,25 +73,29 @@ uses-permission#android.permission.FOREGROUND_SERVICE_SPECIAL_USE
 ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:10:5-89
 	android:name
 		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:10:22-86
+uses-permission#android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION
+ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:11:5-94
+	android:name
+		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:11:22-91
 uses-permission#android.permission.POST_NOTIFICATIONS
-ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:11:5-77
+ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:12:5-77
 	android:name
-		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:11:22-74
+		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:12:22-74
 queries
-ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:13:5-18:15
+ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:14:5-19:15
 intent#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:14:9-17:18
+ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:15:9-18:18
 action#android.intent.action.MAIN
-ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:15:13-65
+ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:16:13-65
 	android:name
-		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:15:21-62
+		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:16:21-62
 category#android.intent.category.LAUNCHER
-ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:16:13-73
+ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:17:13-73
 	android:name
-		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:16:23-70
+		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:17:23-70
 application
-ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:20:5-48:19
-INJECTED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:20:5-48:19
+ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:21:5-49:19
+INJECTED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:21:5-49:19
 MERGED from [com.google.android.material:material:1.13.0] C:\Users\panto\.gradle\caches\9.2.1\transforms\05b3606e7f775ee96e934027dd6727ca\workspace\transformed\material-1.13.0\AndroidManifest.xml:22:5-20
 MERGED from [com.google.android.material:material:1.13.0] C:\Users\panto\.gradle\caches\9.2.1\transforms\05b3606e7f775ee96e934027dd6727ca\workspace\transformed\material-1.13.0\AndroidManifest.xml:22:5-20
 MERGED from [androidx.constraintlayout:constraintlayout:2.2.1] C:\Users\panto\.gradle\caches\9.2.1\transforms\d9d93beffa406ce8a3ecc2f5327ef6f5\workspace\transformed\constraintlayout-2.2.1\AndroidManifest.xml:7:5-20
@@ -113,45 +117,45 @@ MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\panto\.gradle\cach
 	android:appComponentFactory
 		ADDED from [androidx.core:core:1.18.0] C:\Users\panto\.gradle\caches\9.2.1\transforms\4cda18ccbbcc6c78e20983d4909a8885\workspace\transformed\core-1.18.0\AndroidManifest.xml:28:18-86
 	android:supportsRtl
-		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:27:9-35
+		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:28:9-35
 	android:label
-		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:25:9-41
+		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:26:9-41
 	android:fullBackupContent
-		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:23:9-54
+		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:24:9-54
 	android:roundIcon
-		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:26:9-54
+		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:27:9-54
 	android:icon
-		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:24:9-43
+		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:25:9-43
 	android:allowBackup
-		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:21:9-35
+		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:22:9-35
 	android:theme
-		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:28:9-47
+		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:29:9-47
 	android:dataExtractionRules
-		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:22:9-65
+		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:23:9-65
 service#com.example.customlux.BrightnessService
-ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:30:9-37:19
+ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:31:9-38:19
 	android:enabled
-		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:32:13-35
+		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:33:13-35
 	android:exported
-		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:33:13-37
+		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:34:13-37
 	android:foregroundServiceType
-		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:34:13-55
+		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:35:13-71
 	android:name
-		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:31:13-46
+		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:32:13-46
 property#android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE
-ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:35:13-36:110
+ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:36:13-37:110
 	android:value
-		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:36:17-108
+		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:37:17-108
 	android:name
-		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:35:23-82
+		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:36:23-82
 activity#com.example.customlux.MainActivity
-ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:39:9-46:20
+ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:40:9-47:20
 	android:exported
-		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:41:13-36
+		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:42:13-36
 	android:name
-		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:40:13-41
+		ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:41:13-41
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:42:13-45:29
+ADDED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml:43:13-46:29
 uses-sdk
 INJECTED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from C:\Users\panto\Documents\Android Studio Projects\CustomLux\CustomLux\app\src\main\AndroidManifest.xml

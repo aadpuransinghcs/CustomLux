@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="bg_accent">#1E1E1E</color>
+    <!-- Semantic Colors - Dark Mode -->
     <color name="bg_app">#121212</color>
+    <color name="bg_accent">#1E1E1E</color>
     <color name="bg_card">#242424</color>
-    <color name="switch_thumb_off">#757575</color>
-    <color name="switch_track_off">#3C3C3C</color>
+
     <color name="text_main">#E0E0E0</color>
     <color name="text_secondary">#BDBDBD</color>
     <color name="text_sub">#9E9E9E</color>
+
+    <!-- Fix for Switch Contrast in Dark Mode -->
+    <color name="switch_track_off">#3C3C3C</color>
+    <color name="switch_thumb_off">#757575</color>
 </resources>

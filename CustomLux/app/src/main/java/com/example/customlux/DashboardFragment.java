@@ -19,6 +19,8 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SwitchCompat;
@@ -27,6 +29,9 @@ import androidx.fragment.app.Fragment;
 
 import java.util.List;
 
+/**
+ * Main dashboard view showing live sensor data and the list of per-app brightness profiles.
+ */
 public class DashboardFragment extends Fragment {
 
     private TextView luxDisplay;
@@ -36,42 +41,77 @@ public class DashboardFragment extends Fragment {
     private DatabaseHelper dbHelper;
     private SharedPreferences prefs;
 
-    private BroadcastReceiver updateReceiver = new BroadcastReceiver() {
+    /**
+     * Listens for brightness and lux updates from the background service.
+     */
+    private final BroadcastReceiver updateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if ("lux_update".equals(intent.getAction())) {
                 float lux = intent.getFloatExtra("lux_value", 0);
                 int brightness = intent.getIntExtra("brightness_value", 0);
-                if (luxDisplay != null) luxDisplay.setText("Ambient: " + (int)lux + " Lux");
-                if (brightnessDisplay != null) brightnessDisplay.setText("Brightness: " + brightness + "%");
+                
+                // Update live readout labels
+                if (luxDisplay != null) {
+                    luxDisplay.setText(getString(R.string.lux_value_label, (int) lux));
+                }
+                if (brightnessDisplay != null) {
+                    if (brightness == -1) {
+                        brightnessDisplay.setText(getString(R.string.not_available));
+                    } else {
+                        brightnessDisplay.setText(getString(R.string.brightness_value_label, brightness));
+                    }
+                }
             }
         }
     };
+
+    /**
+     * Handles the runtime notification permission request result.
+     */
+    private final ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    checkPermissions();
+                }
+            });
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_dashboard, container, false);
 
+        // Bind UI components
         luxDisplay = view.findViewById(R.id.lux_display);
         brightnessDisplay = view.findViewById(R.id.brightness_display);
         serviceSwitch = view.findViewById(R.id.service_switch);
         appProfilesContainer = view.findViewById(R.id.app_profiles_container);
+        ImageView btnSettings = view.findViewById(R.id.btn_settings);
 
-        dbHelper = new DatabaseHelper(getContext());
-        prefs = getContext().getSharedPreferences("CustomLuxPrefs", Context.MODE_PRIVATE);
+        Context context = getContext();
+        if (context != null) {
+            dbHelper = new DatabaseHelper(context);
+            prefs = context.getSharedPreferences("CustomLuxPrefs", Context.MODE_PRIVATE);
 
-        serviceSwitch.setChecked(prefs.getBoolean("service_enabled", false));
-        serviceSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                if (checkPermissions()) {
-                    startService();
+            // Sync switch state with saved preference
+            serviceSwitch.setChecked(prefs.getBoolean("service_enabled", false));
+            serviceSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (isChecked) {
+                    if (checkPermissions()) {
+                        startService();
+                    } else {
+                        serviceSwitch.setChecked(false); // Revert if permissions missing
+                    }
                 } else {
-                    serviceSwitch.setChecked(false);
+                    stopService();
                 }
-            } else {
-                stopService();
-            }
+            });
+        }
+
+        // Open advanced settings overlay
+        btnSettings.setOnClickListener(v -> {
+            SettingsDialogFragment dialog = new SettingsDialogFragment();
+            dialog.show(getChildFragmentManager(), "SettingsDialog");
         });
 
         refreshAppProfiles();
@@ -79,35 +119,56 @@ public class DashboardFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Starts the background monitoring service.
+     */
     private void startService() {
+        Context context = getContext();
+        if (context == null || prefs == null) return;
+
         prefs.edit().putBoolean("service_enabled", true).apply();
-        Intent intent = new Intent(getContext(), BrightnessService.class);
+        Intent intent = new Intent(context, BrightnessService.class);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            getContext().startForegroundService(intent);
+            context.startForegroundService(intent);
         } else {
-            getContext().startService(intent);
+            context.startService(intent);
         }
     }
 
+    /**
+     * Stops the background monitoring service and resets labels.
+     */
     private void stopService() {
+        Context context = getContext();
+        if (context == null || prefs == null) return;
+
         prefs.edit().putBoolean("service_enabled", false).apply();
-        Intent intent = new Intent(getContext(), BrightnessService.class);
-        getContext().stopService(intent);
-        if (luxDisplay != null) luxDisplay.setText("Ambient: -- Lux");
-        if (brightnessDisplay != null) brightnessDisplay.setText("Brightness: --");
+        Intent intent = new Intent(context, BrightnessService.class);
+        context.stopService(intent);
+        if (luxDisplay != null) luxDisplay.setText(getString(R.string.ambient_default));
+        if (brightnessDisplay != null) brightnessDisplay.setText(getString(R.string.brightness_default));
     }
 
+    /**
+     * Verifies all mandatory system permissions are granted.
+     */
     private boolean checkPermissions() {
-        boolean writeSettings = Settings.System.canWrite(getContext());
+        Context context = getContext();
+        if (context == null) return false;
+
+        boolean writeSettings = Settings.System.canWrite(context);
         
-        AppOpsManager appOps = (AppOpsManager) getContext().getSystemService(Context.APP_OPS_SERVICE);
-        int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
-                android.os.Process.myUid(), getContext().getPackageName());
-        boolean usageStats = (mode == AppOpsManager.MODE_ALLOWED);
+        AppOpsManager appOps = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
+        boolean usageStats = false;
+        if (appOps != null) {
+            int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
+                    android.os.Process.myUid(), context.getPackageName());
+            usageStats = (mode == AppOpsManager.MODE_ALLOWED);
+        }
 
         boolean notificationPerm = true;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            notificationPerm = ContextCompat.checkSelfPermission(getContext(), android.Manifest.permission.POST_NOTIFICATIONS) 
+            notificationPerm = ContextCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS) 
                     == android.content.pm.PackageManager.PERMISSION_GRANTED;
         }
 
@@ -118,26 +179,32 @@ public class DashboardFragment extends Fragment {
         return true;
     }
 
+    /**
+     * Shows a detailed alert explaining why specific permissions are needed.
+     */
     private void showPermissionDialog(boolean writeSettings, boolean usageStats, boolean notificationPerm) {
+        Context context = getContext();
+        if (context == null) return;
+
         StringBuilder message = new StringBuilder("CustomLux requires the following permissions to function:\n");
         if (!writeSettings) message.append("\n- Modify System Settings (to change brightness)");
         if (!usageStats) message.append("\n- Usage Access (to detect foreground apps)");
         if (!notificationPerm) message.append("\n- Notifications (required for the background service)");
 
-        new AlertDialog.Builder(getContext())
+        new AlertDialog.Builder(context)
                 .setTitle("Permissions Required")
                 .setMessage(message.toString())
                 .setPositiveButton("Go to Settings", (dialog, which) -> {
                     if (!writeSettings) {
                         Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
-                        intent.setData(Uri.parse("package:" + getContext().getPackageName()));
+                        intent.setData(Uri.parse("package:" + context.getPackageName()));
                         startActivity(intent);
                     } else if (!usageStats) {
                         Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
                         startActivity(intent);
                     } else if (!notificationPerm) {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            requestPermissions(new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 101);
+                            requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS);
                         }
                     }
                 })
@@ -145,8 +212,11 @@ public class DashboardFragment extends Fragment {
                 .show();
     }
 
+    /**
+     * Renders the dynamic list of app profiles from the database.
+     */
     public void refreshAppProfiles() {
-        if (appProfilesContainer == null) return;
+        if (appProfilesContainer == null || dbHelper == null) return;
         appProfilesContainer.removeAllViews();
         List<AppProfile> profiles = dbHelper.getAllProfiles();
         for (AppProfile profile : profiles) {
@@ -160,17 +230,21 @@ public class DashboardFragment extends Fragment {
 
             nameText.setText(profile.getAppName());
             
+            // Format offset label (e.g. +10%)
             int offset = profile.getBrightnessOffset();
-            brightnessLabel.setText((offset >= 0 ? "+" : "") + offset + "%");
+            String label = (offset >= 0 ? "+" : "") + offset + "%";
+            brightnessLabel.setText(label);
             seekBar.setProgress(offset + 100);
             appSwitch.setChecked(profile.isEnabled());
 
+            // Handle brightness offset slider interaction
             seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                     if (fromUser) {
                         int realOffset = progress - 100;
-                        brightnessLabel.setText((realOffset >= 0 ? "+" : "") + realOffset + "%");
+                        String l = (realOffset >= 0 ? "+" : "") + realOffset + "%";
+                        brightnessLabel.setText(l);
                         profile.setBrightnessOffset(realOffset);
                         dbHelper.updateProfile(profile);
                     }
@@ -179,11 +253,13 @@ public class DashboardFragment extends Fragment {
                 @Override public void onStopTrackingTouch(SeekBar seekBar) {}
             });
 
+            // Toggle individual app profile status
             appSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 profile.setEnabled(isChecked);
                 dbHelper.updateProfile(profile);
             });
 
+            // Remove profile from list and database
             deleteBtn.setOnClickListener(v -> {
                 dbHelper.deleteProfile(profile.getPackageName());
                 refreshAppProfiles();
@@ -196,12 +272,14 @@ public class DashboardFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (getContext() != null) {
+        Context context = getContext();
+        if (context != null) {
             IntentFilter filter = new IntentFilter("lux_update");
+            // Register receiver with appropriate export flag for Android 14+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                getContext().registerReceiver(updateReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+                context.registerReceiver(updateReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
             } else {
-                getContext().registerReceiver(updateReceiver, filter);
+                context.registerReceiver(updateReceiver, filter);
             }
         }
         refreshAppProfiles();
@@ -210,8 +288,9 @@ public class DashboardFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        if (getContext() != null) {
-            getContext().unregisterReceiver(updateReceiver);
+        Context context = getContext();
+        if (context != null) {
+            context.unregisterReceiver(updateReceiver);
         }
     }
 }

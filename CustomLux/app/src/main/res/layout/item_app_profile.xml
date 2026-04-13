@@ -3,19 +3,21 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="6dp"
-    android:background="@android:color/white"
+    android:background="@color/bg_card"
     android:elevation="2dp"
     android:layout_margin="6dp">
 
+    <!-- App Name -->
     <TextView
         android:id="@+id/app_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="App Name"
+        android:text="@string/default_app_name"
         android:layout_marginTop="8dp"
         android:textSize="18sp"
-        android:textColor="@android:color/black" />
+        android:textColor="@color/text_main" />
 
+    <!-- Custom App Profile Toggle -->
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/app_switch"
         android:layout_width="wrap_content"
@@ -23,15 +25,18 @@
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="10dp"/>
 
+    <!-- Percentage difference in brightness for app -->
     <TextView
         android:id="@+id/brightness_label"
         android:layout_width="50dp"
         android:layout_height="wrap_content"
         android:layout_below="@id/app_name"
         android:layout_marginStart="4dp"
-        android:text="0%"
+        android:text="@string/zero_percent"
+        android:textColor="@color/text_main"
         android:layout_marginTop="8dp" />
 
+    <!-- Seekbar -->
     <SeekBar
         android:id="@+id/brightness_seekbar"
         android:layout_width="match_parent"
@@ -41,6 +46,7 @@
         android:layout_marginTop="8dp"
         android:max="200" />
 
+    <!-- Delete App Profile Button -->
     <ImageView
         android:id="@+id/btn_delete"
         android:layout_width="wrap_content"
@@ -48,6 +54,7 @@
         android:layout_below="@id/app_switch"
         android:src="@android:drawable/ic_menu_delete"
         android:layout_marginTop="15dp"
-        android:padding="0dp" />
+        android:padding="0dp"
+        android:contentDescription="@string/delete_profile" />
 
 </RelativeLayout>

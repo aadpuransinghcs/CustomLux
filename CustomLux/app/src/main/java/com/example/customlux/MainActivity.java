@@ -1,16 +1,25 @@
 package com.example.customlux;
 
 import android.app.AlertDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.media.projection.MediaProjectionManager;
 import android.os.Bundle;
+import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+/**
+ * Main Activity that hosts the Dashboard and Curve Editor fragments.
+ */
 public class MainActivity extends AppCompatActivity implements AppSelectionDialogFragment.OnAppSelectedListener {
 
+    private static final int REQUEST_MEDIA_PROJECTION = 1001;
     private DatabaseHelper dbHelper;
     private BottomNavigationView bottomNav;
     private FloatingActionButton fab;
@@ -24,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements AppSelectionDialo
         bottomNav = findViewById(R.id.bottom_navigation);
         fab = findViewById(R.id.fab_add_profile);
 
+        // Handle navigation between fragments with unsaved changes check
         bottomNav.setOnNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
             Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
@@ -40,8 +50,8 @@ public class MainActivity extends AppCompatActivity implements AppSelectionDialo
             return true;
         });
 
+        // Open app selection dialog
         fab.setOnClickListener(v -> {
-            // Fix: Prevent opening multiple dialogs if clicked quickly
             if (getSupportFragmentManager().findFragmentByTag("AppSelection") == null) {
                 AppSelectionDialogFragment dialog = new AppSelectionDialogFragment();
                 dialog.show(getSupportFragmentManager(), "AppSelection");
@@ -53,6 +63,9 @@ public class MainActivity extends AppCompatActivity implements AppSelectionDialo
         }
     }
 
+    /**
+     * Swaps the visible fragment based on navigation selection.
+     */
     private void switchFragment(int itemId) {
         Fragment selectedFragment = null;
         if (itemId == R.id.navigation_dashboard) {
@@ -70,6 +83,9 @@ public class MainActivity extends AppCompatActivity implements AppSelectionDialo
         }
     }
 
+    /**
+     * Shows a confirmation dialog before discarding unsaved curve changes.
+     */
     private void showUnsavedChangesDialog(CurveEditorFragment fragment) {
         new AlertDialog.Builder(this)
                 .setTitle("Unsaved Changes")
@@ -84,6 +100,32 @@ public class MainActivity extends AppCompatActivity implements AppSelectionDialo
                 })
                 .setNeutralButton("Cancel", null)
                 .show();
+    }
+
+    /**
+     * Triggers the system media projection permission request.
+     */
+    public void requestMediaProjection() {
+        MediaProjectionManager mpm = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
+        startActivityForResult(mpm.createScreenCaptureIntent(), REQUEST_MEDIA_PROJECTION);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_MEDIA_PROJECTION) {
+            if (resultCode == RESULT_OK && data != null) {
+                BrightnessService.setProjectionIntent(data);
+                // Refresh service to apply new projection intent
+                if (getSharedPreferences("CustomLuxPrefs", MODE_PRIVATE).getBoolean("service_enabled", false)) {
+                    Intent serviceIntent = new Intent(this, BrightnessService.class);
+                    startService(serviceIntent);
+                }
+            } else {
+                Toast.makeText(this, "Screen capture permission denied", Toast.LENGTH_SHORT).show();
+                getSharedPreferences("CustomLuxPrefs", MODE_PRIVATE).edit().putBoolean("white_level_comp", false).apply();
+            }
+        }
     }
 
     @Override

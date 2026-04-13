@@ -23,29 +23,38 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import java.util.Locale;
 
+/**
+ * Fragment for editing the adaptive brightness curve.
+ * Allows users to drag points on a graph to define how brightness reacts to ambient light.
+ */
 public class CurveEditorFragment extends Fragment {
 
-    private SeekBar seekMin, seekMax, seekPointCount;
+    private SeekBar seekMin;
+    private SeekBar seekMax;
     private TextView labelMin, labelMax, labelPointCount;
     private SharedPreferences prefs;
     private ImageView drawingView;
     private int[] curvePoints;
     private int currentPointCount = 5;
-    private boolean isDirty = false;
+    private boolean isDirty = false; // Tracks if there are unsaved changes
 
-    // Graph Layout Constants
-    private final float PAD_L = 80f; // Increased for labels
-    private final float PAD_B = 90f;
-    private final float PAD_R = 40f;
-    private final float PAD_T = 30f;
+    // Padding constants for the graph layout
+    private static final float PAD_L = 85f;
+    private static final float PAD_B = 90f;
+    private static final float PAD_R = 40f;
+    private static final float PAD_T = 30f;
 
     private final float MAX_LUX = 10000f;
     private final float MIN_LUX = 1f;
 
+    /**
+     * Checks if there are any pending changes that haven't been saved to preferences.
+     */
     public boolean hasUnsavedChanges() {
         return isDirty;
     }
@@ -56,47 +65,54 @@ public class CurveEditorFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_curve_editor, container, false);
 
+        // UI element initialization
         seekMin = view.findViewById(R.id.seek_min_brightness);
         seekMax = view.findViewById(R.id.seek_max_brightness);
         labelMin = view.findViewById(R.id.label_min_brightness);
         labelMax = view.findViewById(R.id.label_max_brightness);
         labelPointCount = view.findViewById(R.id.label_point_count);
-        seekPointCount = view.findViewById(R.id.seek_point_count);
+        SeekBar seekPointCount = view.findViewById(R.id.seek_point_count);
         drawingView = view.findViewById(R.id.curve_drawing_view);
         Button btnSave = view.findViewById(R.id.btn_save_curve);
 
-        prefs = getContext().getSharedPreferences("CustomLuxPrefs", Context.MODE_PRIVATE);
+        Context context = getContext();
+        if (context != null) {
+            prefs = context.getSharedPreferences("CustomLuxPrefs", Context.MODE_PRIVATE);
 
-        int savedMin = prefs.getInt("min_brightness", 10);
-        int savedMax = prefs.getInt("max_brightness", 100);
-        currentPointCount = prefs.getInt("point_count", 5);
-        if (currentPointCount < 1) currentPointCount = 1;
+            // Load existing curve settings from preferences
+            int savedMin = prefs.getInt("min_brightness", 10);
+            int savedMax = prefs.getInt("max_brightness", 100);
+            currentPointCount = prefs.getInt("point_count", 5);
+            if (currentPointCount < 1) currentPointCount = 1;
 
-        seekMin.setProgress(savedMin);
-        seekMax.setProgress(savedMax);
-        seekPointCount.setProgress(currentPointCount - 1);
-        labelPointCount.setText("Movable Points: " + currentPointCount);
-        updateLabels(savedMin, savedMax);
+            seekMin.setProgress(savedMin);
+            seekMax.setProgress(savedMax);
+            seekPointCount.setProgress(currentPointCount - 1);
+            labelPointCount.setText(getString(R.string.label_movable_points, currentPointCount));
+            updateLabels(savedMin, savedMax);
 
-        curvePoints = new int[15];
-        String savedPoints = prefs.getString("curve_points_data", "");
-        int totalPoints = currentPointCount + 2;
+            curvePoints = new int[15];
+            String savedPoints = prefs.getString("curve_points_data", "");
+            int totalPoints = currentPointCount + 2;
 
-        if (!savedPoints.isEmpty()) {
-            String[] splitPoints = savedPoints.split(",");
-            if (splitPoints.length == totalPoints) {
-                for (int i = 0; i < splitPoints.length; i++) {
-                    curvePoints[i] = Integer.parseInt(splitPoints[i]);
+            // Initialize curve points from storage or defaults
+            if (!savedPoints.isEmpty()) {
+                String[] splitPoints = savedPoints.split(",");
+                if (splitPoints.length == totalPoints) {
+                    for (int i = 0; i < splitPoints.length; i++) {
+                        curvePoints[i] = Integer.parseInt(splitPoints[i]);
+                    }
+                    curvePoints[0] = savedMin;
+                    curvePoints[totalPoints - 1] = savedMax;
+                } else {
+                    initDefaultPoints(currentPointCount);
                 }
-                curvePoints[0] = savedMin;
-                curvePoints[totalPoints - 1] = savedMax;
             } else {
                 initDefaultPoints(currentPointCount);
             }
-        } else {
-            initDefaultPoints(currentPointCount);
         }
 
+        // Handle minimum brightness slider changes
         seekMin.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -109,6 +125,7 @@ public class CurveEditorFragment extends Fragment {
             @Override public void onStopTrackingTouch(SeekBar seekBar) {}
         });
 
+        // Handle maximum brightness slider changes
         seekMax.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -121,11 +138,12 @@ public class CurveEditorFragment extends Fragment {
             @Override public void onStopTrackingTouch(SeekBar seekBar) {}
         });
 
+        // Handle point count slider changes
         seekPointCount.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 currentPointCount = progress + 1;
-                labelPointCount.setText("Movable Points: " + currentPointCount);
+                labelPointCount.setText(getString(R.string.label_movable_points, currentPointCount));
                 initDefaultPoints(currentPointCount);
                 drawCurve();
                 if (fromUser) isDirty = true;
@@ -134,7 +152,9 @@ public class CurveEditorFragment extends Fragment {
             @Override public void onStopTrackingTouch(SeekBar seekBar) {}
         });
 
+        // Handle touch interactions with the graph to move points
         drawingView.setOnTouchListener((v, event) -> {
+            // Prevent the ScrollView from intercepting dragging on the graph
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 ViewParent parent = v.getParent();
                 while (parent != null) {
@@ -148,11 +168,14 @@ public class CurveEditorFragment extends Fragment {
                 float graphH = drawingView.getHeight() - PAD_B - PAD_T;
                 int total = currentPointCount + 2;
 
+                // Identify which point is being dragged based on X position
                 int pointIndex = Math.round((event.getX() - PAD_L) / (graphW / (float)(total - 1)));
                 pointIndex = Math.max(0, Math.min(pointIndex, total - 1));
 
+                // Min and Max Brightness points are controlled by specific sliders, not direct graph dragging
                 if (pointIndex == 0 || pointIndex == total - 1) return true;
 
+                // Update the selected point's brightness value
                 int brightness = (int) (100 - ((event.getY() - PAD_T) / graphH * 100));
                 curvePoints[pointIndex] = Math.max(0, Math.min(brightness, 100));
                 drawCurve();
@@ -163,12 +186,17 @@ public class CurveEditorFragment extends Fragment {
 
         btnSave.setOnClickListener(v -> saveChanges());
 
+        // Wait for view layout to be finished before drawing the first time
         drawingView.post(this::drawCurve);
 
         return view;
     }
 
+    /**
+     * Persists the current curve configuration to shared preferences.
+     */
     public void saveChanges() {
+        if (prefs == null) return;
         int total = currentPointCount + 2;
         StringBuilder sbPoints = new StringBuilder();
         for (int i = 0; i < total; i++) {
@@ -185,15 +213,21 @@ public class CurveEditorFragment extends Fragment {
         Toast.makeText(getContext(), "Curve Settings Saved", Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * Resets the dirty flag if user chooses to discard changes.
+     */
     public void discardChanges() {
         isDirty = false;
     }
 
     private void updateLabels(int min, int max) {
-        labelMin.setText("Minimum Brightness: " + min + "%");
-        labelMax.setText("Maximum Brightness: " + max + "%");
+        labelMin.setText(getString(R.string.label_min_brightness, min));
+        labelMax.setText(getString(R.string.label_max_brightness, max));
     }
 
+    /**
+     * Initializes a linear curve between min and max brightness as a starting point.
+     */
     private void initDefaultPoints(int middleCount) {
         int total = middleCount + 2;
         int min = seekMin.getProgress();
@@ -205,6 +239,9 @@ public class CurveEditorFragment extends Fragment {
         }
     }
 
+    /**
+     * Helper to format lux values for the X-axis labels (e.g., 1500 becomes 1.5k).
+     */
     private String formatLuxLabel(float lux) {
         if (lux < 1000) {
             return String.valueOf((int) lux);
@@ -213,6 +250,9 @@ public class CurveEditorFragment extends Fragment {
         }
     }
 
+    /**
+     * Rounds lux values to "clean" numbers for cleaner grid labeling.
+     */
     private float cleanLuxValue(float val) {
         if (val < 10) return Math.round(val);
         if (val < 100) return Math.round(val / 5) * 5;
@@ -220,8 +260,12 @@ public class CurveEditorFragment extends Fragment {
         return Math.round(val / 100) * 100;
     }
 
+    /**
+     * Core drawing logic that renders the interactive graph onto a Bitmap.
+     */
     private void drawCurve() {
-        if (drawingView == null || drawingView.getWidth() <= 0) return;
+        Context context = getContext();
+        if (drawingView == null || drawingView.getWidth() <= 0 || context == null) return;
 
         int w = drawingView.getWidth();
         int h = drawingView.getHeight();
@@ -231,29 +275,38 @@ public class CurveEditorFragment extends Fragment {
         float graphW = w - PAD_L - PAD_R;
         float graphH = h - PAD_B - PAD_T;
 
-        Paint bgPaint = new Paint();
-        bgPaint.setColor(Color.WHITE);
-        canvas.drawRect(PAD_L, PAD_T, PAD_L + graphW, PAD_T + graphH, bgPaint);
+        // Semantic background and text
+        int bgColor = ContextCompat.getColor(context, R.color.bg_app);
+        int textColor = ContextCompat.getColor(context, R.color.text_main);
+        int curveColor = ContextCompat.getColor(context, R.color.purple_curve);
+        int gridColor = Color.argb(80, Color.red(textColor), Color.green(textColor), Color.blue(textColor));
+
+        canvas.drawColor(bgColor);
+
+        // Draw inner grid background
+        Paint gridBgPaint = new Paint();
+        gridBgPaint.setColor(ContextCompat.getColor(context, R.color.bg_accent));
+        canvas.drawRect(PAD_L, PAD_T, PAD_L + graphW, PAD_T + graphH, gridBgPaint);
 
         Paint gridPaint = new Paint();
-        gridPaint.setColor(Color.LTGRAY);
+        gridPaint.setColor(gridColor);
         gridPaint.setStyle(Paint.Style.STROKE);
         gridPaint.setStrokeWidth(2);
         gridPaint.setPathEffect(new DashPathEffect(new float[]{10, 10}, 0));
 
         Paint textPaint = new Paint();
-        textPaint.setColor(Color.BLACK);
+        textPaint.setColor(textColor);
         textPaint.setTextSize(24f);
         textPaint.setAntiAlias(true);
 
-        // Y Axis Labels (Brightness %)
+        // Draw Y-axis labels (Brightness %)
         for (int i = 0; i <= 100; i += 25) {
             float y = PAD_T + graphH - (i * graphH / 100f);
             canvas.drawLine(PAD_L, y, PAD_L + graphW, y, gridPaint);
             canvas.drawText(i + "%", 10, y + 10, textPaint);
         }
 
-        // X Axis Labels (Logarithmic Lux)
+        // Draw X-axis labels (Logarithmic Ambient Light)
         int total = currentPointCount + 2;
         double minLog = Math.log10(MIN_LUX);
         double maxLog = Math.log10(MAX_LUX);
@@ -262,18 +315,19 @@ public class CurveEditorFragment extends Fragment {
         for (int i = 0; i < total; i++) {
             float x = PAD_L + (graphW / (float)(total - 1)) * i;
             canvas.drawLine(x, PAD_T, x, PAD_T + graphH, gridPaint);
-
+            
             double logValue = minLog + (i * step);
             float rawLux = (float) Math.pow(10, logValue);
             float lux = cleanLuxValue(rawLux);
-
+            
             String label = formatLuxLabel(lux);
             float labelWidth = textPaint.measureText(label);
             canvas.drawText(label, x - (labelWidth / 2), PAD_T + graphH + 35, textPaint);
         }
 
+        // Draw the curve line
         Paint linePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        linePaint.setColor(Color.parseColor("#6200EE"));
+        linePaint.setColor(curveColor);
         linePaint.setStrokeWidth(8);
         linePaint.setStyle(Paint.Style.STROKE);
 
@@ -288,7 +342,8 @@ public class CurveEditorFragment extends Fragment {
             if (i == 0) path.moveTo(x, y);
             else path.lineTo(x, y);
 
-            dotPaint.setColor((i == 0 || i == total - 1) ? Color.GRAY : Color.parseColor("#6200EE"));
+            // Highlight interactive points with the primary theme color
+            dotPaint.setColor((i == 0 || i == total - 1) ? Color.GRAY : curveColor);
             canvas.drawCircle(x, y, 15, dotPaint);
         }
         canvas.drawPath(path, linePaint);

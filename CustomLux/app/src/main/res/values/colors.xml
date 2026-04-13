@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="bg_app">#FFFFFF</color>
+    <color name="bg_accent">#F0F0F0</color>
+    <color name="bg_card">#FFFFFF</color>
+    <color name="text_main">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="text_sub">#9E9E9E</color>
+    <color name="switch_track_off">#BDBDBD</color>
+    <color name="switch_thumb_off">#FFFFFF</color>
+    <color name="purple_curve">#6200EE</color>
 </resources>

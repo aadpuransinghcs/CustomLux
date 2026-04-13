@@ -12,22 +12,23 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Brightness Curve"
+            android:text="@string/title_brightness_curve"
             android:textSize="20sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textColor="@color/text_main" />
 
         <FrameLayout
             android:id="@+id/graph_container"
             android:layout_width="match_parent"
             android:layout_height="250dp"
             android:layout_marginVertical="16dp"
-            android:background="#F5F5F5">
+            android:background="@color/bg_accent">
 
             <ImageView
                 android:id="@+id/curve_drawing_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:contentDescription="Brightness Curve Editor"
+                android:contentDescription="@string/desc_curve_editor"
                 android:scaleType="fitXY"
                 android:clickable="true"
                 android:focusable="true" />
@@ -36,15 +37,17 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Curve Settings"
+            android:text="@string/title_curve_settings"
             android:textStyle="bold"
+            android:textColor="@color/text_main"
             android:paddingTop="10dp"/>
 
         <TextView
             android:id="@+id/label_min_brightness"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Minimum Brightness: 10%" />
+            android:text="@string/label_min_brightness"
+            android:textColor="@color/text_main" />
 
         <SeekBar
             android:id="@+id/seek_min_brightness"
@@ -58,7 +61,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="Maximum Brightness: 100%" />
+            android:text="@string/label_max_brightness"
+            android:textColor="@color/text_main" />
         <SeekBar
             android:id="@+id/seek_max_brightness"
             android:layout_width="match_parent"
@@ -70,7 +74,8 @@
             android:id="@+id/label_point_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Movable Points: 5" />
+            android:text="@string/label_movable_points"
+            android:textColor="@color/text_main" />
         <SeekBar
             android:id="@+id/seek_point_count"
             android:layout_width="match_parent"
@@ -84,7 +89,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:backgroundTint="#6200EE"
-            android:text="SAVE CURVE" />
+            android:textColor="@android:color/white"
+            android:text="@string/btn_save_curve" />
 
     </LinearLayout>
 </ScrollView>

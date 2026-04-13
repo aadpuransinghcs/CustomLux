@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- This file was causing duplicate resource errors and its contents were redundant or misplaced. -->
+</resources>
