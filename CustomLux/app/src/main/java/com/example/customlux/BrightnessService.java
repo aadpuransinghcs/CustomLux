@@ -52,7 +52,6 @@ public class BrightnessService extends Service implements SensorEventListener {
 
     private int originalBrightnessMode = -1;
     private boolean isHbmActive = false;
-    private int lastAppOffset = 0;
     
     // Manual base tracking to avoid feedback loops when curve editor is disabled
     private int manualBaseBrightness = 128;
@@ -368,9 +367,6 @@ public class BrightnessService extends Service implements SensorEventListener {
         int scaleOffset = (activeOffsetPercentage * 255 / 100);
         finalBrightnessValue += scaleOffset;
 
-        // Update the global tracking variable for the UI
-        lastAppOffset = activeOffsetPercentage;
-
         // Smart dimming for white content (APL)
         if (lux < 50 && prefs.getBoolean("white_level_comp", false)) {
             float reductionFactor = 1.0f - (currentApl * 0.4f);
@@ -486,7 +482,7 @@ public class BrightnessService extends Service implements SensorEventListener {
         Intent intent = new Intent("lux_update");
         intent.putExtra("lux_value", lux);
         if (brightness != -1) {
-            intent.putExtra("brightness_value", (int)(brightness * 100 / 255));
+            intent.putExtra("brightness_value", brightness * 100 / 255);
         } else {
             intent.putExtra("brightness_value", -1); // -1 signals HBM active
         }
