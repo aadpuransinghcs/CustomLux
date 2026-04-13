@@ -240,7 +240,7 @@ public class BrightnessService extends Service implements SensorEventListener {
         int pixelStride = planes[0].getPixelStride();
         int rowStride = planes[0].getRowStride();
         int width = image.getWidth();
-        int height = width != 0 ? image.getHeight() : 0;
+        int height = image.getHeight();
 
         double totalLuminance = 0;
         int pixelCount = 0;
