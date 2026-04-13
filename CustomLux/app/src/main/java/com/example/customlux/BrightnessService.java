@@ -5,9 +5,12 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.app.usage.UsageEvents;
+import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.PixelFormat;
 import android.hardware.Sensor;
@@ -29,6 +32,7 @@ import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 
 /**
  * Foreground service that monitors ambient light and adjusts screen brightness.
@@ -49,6 +53,21 @@ public class BrightnessService extends Service implements SensorEventListener {
     private int originalBrightnessMode = -1;
     private boolean isHbmActive = false;
     private int lastAppOffset = 0;
+    
+    // Manual base tracking to avoid feedback loops when curve editor is disabled
+    private int manualBaseBrightness = 128;
+    private int lastAppliedBrightness = -1;
+    private int lastBaseBrightness = 128;
+    private float lastKnownLux = -1;
+
+    private final BroadcastReceiver settingsReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if ("settings_updated".equals(intent.getAction())) {
+                refreshBrightness();
+            }
+        }
+    };
 
     // Persistent state for foreground app detection to avoid "losing" the app after a few seconds
     private String currentForegroundApp = "";
@@ -77,6 +96,18 @@ public class BrightnessService extends Service implements SensorEventListener {
         lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
         dbHelper = new DatabaseHelper(this);
         prefs = getSharedPreferences("CustomLuxPrefs", MODE_PRIVATE);
+
+        // Listen for setting changes from the UI
+        IntentFilter filter = new IntentFilter("settings_updated");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(settingsReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+        } else {
+            registerReceiver(settingsReceiver, filter);
+        }
+
+        // Initial base brightness from current system level
+        manualBaseBrightness = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, 128);
+        lastBaseBrightness = manualBaseBrightness;
 
         // Control system adaptive settings
         saveOriginalBrightnessMode();
@@ -252,6 +283,7 @@ public class BrightnessService extends Service implements SensorEventListener {
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
             float lux = event.values[0];
+            lastKnownLux = lux;
 
             // Check for High Brightness Mode handover threshold
             boolean hbmEnabled = prefs.getBoolean("hbm_handover", false);
@@ -305,27 +337,36 @@ public class BrightnessService extends Service implements SensorEventListener {
      */
     private int calculateFinalBrightness(float lux) {
         boolean curveDisabled = prefs.getBoolean("disable_curve_editor", false);
-        int baseBrightness;
+        
+        String currentApp = getForegroundApp();
+        AppProfile profile = dbHelper.getProfile(currentApp);
+        int activeOffsetPercentage = (profile != null && profile.isEnabled()) ? profile.getBrightnessOffset() : 0;
 
+        int baseBrightness;
         if (curveDisabled) {
-            baseBrightness = Settings.System.getInt(getContentResolver(),
+            int currentSystem = Settings.System.getInt(getContentResolver(),
                     Settings.System.SCREEN_BRIGHTNESS, 128);
+
+            // Detect manual user adjustment (e.g., from system slider)
+            // We compare against our last applied value to see if the user moved the slider
+            if (lastAppliedBrightness != -1 && Math.abs(currentSystem - lastAppliedBrightness) > 2) {
+                // If they moved it, we update our internal base to match their choice (removing our offset)
+                int scaleOffset = (activeOffsetPercentage * 255 / 100);
+                manualBaseBrightness = Math.max(0, Math.min(currentSystem - scaleOffset, 255));
+            }
+            baseBrightness = manualBaseBrightness;
         } else {
             baseBrightness = getCurveBrightness(lux);
         }
 
-        String currentApp = getForegroundApp();
-        AppProfile profile = dbHelper.getProfile(currentApp);
+        // Track the base brightness (without app-specific offsets) for reverting on stop
+        lastBaseBrightness = baseBrightness;
 
         int finalBrightnessValue = baseBrightness;
-        int activeOffsetPercentage = 0; // Local variable to ensure fresh calculation
-
-        if (profile != null && profile.isEnabled()) {
-            activeOffsetPercentage = profile.getBrightnessOffset();
-            // Convert % to 0-255 scale
-            int scaleOffset = (activeOffsetPercentage * 255 / 100);
-            finalBrightnessValue += scaleOffset;
-        }
+        
+        // Apply % offset to base (Convert % to 0-255 scale)
+        int scaleOffset = (activeOffsetPercentage * 255 / 100);
+        finalBrightnessValue += scaleOffset;
 
         // Update the global tracking variable for the UI
         lastAppOffset = activeOffsetPercentage;
@@ -391,7 +432,7 @@ public class BrightnessService extends Service implements SensorEventListener {
         // Look back 1 minute to find the most recent foreground transition
         UsageEvents events = usm.queryEvents(currentTime - 60000, currentTime);
         UsageEvents.Event event = new UsageEvents.Event();
-        String detectedApp = currentForegroundApp;
+        String detectedApp = "";
 
         while (events.hasNextEvent()) {
             events.getNextEvent(event);
@@ -400,7 +441,25 @@ public class BrightnessService extends Service implements SensorEventListener {
             }
         }
 
-        currentForegroundApp = detectedApp;
+        if (detectedApp.isEmpty()) {
+            // Fallback: check last used app if no transition events found in last minute
+            List<UsageStats> stats = usm.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, currentTime - 60000, currentTime);
+            if (stats != null && !stats.isEmpty()) {
+                UsageStats mostRecent = null;
+                for (UsageStats s : stats) {
+                    if (mostRecent == null || s.getLastTimeUsed() > mostRecent.getLastTimeUsed()) {
+                        mostRecent = s;
+                    }
+                }
+                if (mostRecent != null) {
+                    detectedApp = mostRecent.getPackageName();
+                }
+            }
+        }
+
+        if (!detectedApp.isEmpty()) {
+            currentForegroundApp = detectedApp;
+        }
         return currentForegroundApp;
     }
 
@@ -409,6 +468,15 @@ public class BrightnessService extends Service implements SensorEventListener {
      */
     private void applyBrightness(int value) {
         Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, value);
+        lastAppliedBrightness = value;
+    }
+
+    private void refreshBrightness() {
+        if (!isHbmActive && lastKnownLux != -1) {
+            int brightness = calculateFinalBrightness(lastKnownLux);
+            applyBrightness(brightness);
+            broadcastUpdate(lastKnownLux, brightness);
+        }
     }
 
     /**
@@ -435,6 +503,11 @@ public class BrightnessService extends Service implements SensorEventListener {
     public void onDestroy() {
         stopProjection();
         sensorManager.unregisterListener(this);
+        unregisterReceiver(settingsReceiver);
+        
+        // Revert to base brightness (remove app-specific offset) before stopping to prevent restart loops
+        applyBrightness(lastBaseBrightness);
+
         restoreOriginalBrightnessMode(); // Restore system settings on exit
         super.onDestroy();
     }

@@ -48,6 +48,11 @@ public class DashboardFragment extends Fragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             if ("lux_update".equals(intent.getAction())) {
+                // If service was just disabled, ignore late incoming broadcasts to prevent UI flicker
+                if (prefs != null && !prefs.getBoolean("service_enabled", false)) {
+                    return;
+                }
+
                 float lux = intent.getFloatExtra("lux_value", 0);
                 int brightness = intent.getIntExtra("brightness_value", 0);
                 
@@ -94,7 +99,15 @@ public class DashboardFragment extends Fragment {
             prefs = context.getSharedPreferences("CustomLuxPrefs", Context.MODE_PRIVATE);
 
             // Sync switch state with saved preference
-            serviceSwitch.setChecked(prefs.getBoolean("service_enabled", false));
+            boolean isEnabled = prefs.getBoolean("service_enabled", false);
+            serviceSwitch.setChecked(isEnabled);
+            
+            // Ensure labels start as default if service is currently off
+            if (!isEnabled) {
+                if (luxDisplay != null) luxDisplay.setText(getString(R.string.ambient_default));
+                if (brightnessDisplay != null) brightnessDisplay.setText(getString(R.string.brightness_default));
+            }
+
             serviceSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (isChecked) {
                     if (checkPermissions()) {
@@ -247,6 +260,12 @@ public class DashboardFragment extends Fragment {
                         brightnessLabel.setText(l);
                         profile.setBrightnessOffset(realOffset);
                         dbHelper.updateProfile(profile);
+                        
+                        // Notify the service that a setting has changed
+                        Context context = getContext();
+                        if (context != null) {
+                            context.sendBroadcast(new Intent("settings_updated"));
+                        }
                     }
                 }
                 @Override public void onStartTrackingTouch(SeekBar seekBar) {}
@@ -257,12 +276,24 @@ public class DashboardFragment extends Fragment {
             appSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 profile.setEnabled(isChecked);
                 dbHelper.updateProfile(profile);
+                
+                // Notify the service that a setting has changed
+                Context context = getContext();
+                if (context != null) {
+                    context.sendBroadcast(new Intent("settings_updated"));
+                }
             });
 
             // Remove profile from list and database
             deleteBtn.setOnClickListener(v -> {
                 dbHelper.deleteProfile(profile.getPackageName());
                 refreshAppProfiles();
+                
+                // Notify the service that a setting has changed
+                Context context = getContext();
+                if (context != null) {
+                    context.sendBroadcast(new Intent("settings_updated"));
+                }
             });
 
             appProfilesContainer.addView(itemView);
